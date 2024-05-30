@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .anime-card {
+            margin-bottom: 20px;
+        }
+        .anime-img {
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5 mb-4">Anime Search</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search Anime...">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="animeResults" class="row"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchButton').addEventListener('click', function() {
+                var searchInput = document.getElementById('searchInput').value.trim();
+                if (searchInput === '') {
+                    return;
+                }
+
+                fetch('http://127.0.0.1:5000/search-anime/' + searchInput)
+                    .then(response => response.json())
+                    .then(data => displayResults(data))
+                    .catch(error => console.error('Error searching anime:', error));
+            });
+
+            function displayResults(results) {
+                var animeResultsDiv = document.getElementById('animeResults');
+                animeResultsDiv.innerHTML = '';
+
+                if (results.length === 0) {
+                    animeResultsDiv.innerHTML = "<p>No results found.</p>";
+                    return;
+                }
+
+                results.forEach(function(anime) {
+                    var card = `
+                        <div class="col-md-4 anime-card">
+                            <div class="card">
+                                <img src="${anime.src}" class="card-img-top anime-img" alt="${anime.alt}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${anime.name}</h5>
+                                    <p class="card-text">Episode: ${anime.episode}</p>
+                                    <a href="${anime.anime_url}" class="btn btn-primary" target="_blank">View Anime</a>
+                                    <a href="${anime.episode_url}" class="btn btn-secondary" target="_blank">View Episode</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    animeResultsDiv.innerHTML += card;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
